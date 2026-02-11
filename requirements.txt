@@ -1,10 +1,11 @@
 requests==2.31.0
 beautifulsoup4==4.12.3
-lxml==5.1.0
-playwright==1.42.0
+lxml==4.9.3
 python-telegram-bot==20.8
-matplotlib==3.8.3
+matplotlib==3.7.5
 APScheduler==3.10.4
 python-dotenv==1.0.1
 fake-useragent==1.4.0
 aiohttp==3.9.3
+playwright==1.40.0
+greenlet==3.0.3
