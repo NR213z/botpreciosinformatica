@@ -233,6 +233,92 @@ Luego registrala en `PARSERS` y en `detect_store()`.
 
 ---
 
+## ☁️ Deploy en Render (free tier)
+
+### Arquitectura para no pagar
+
+```
+Render Free Web Service
+        ↑  ping cada 14 min
+   UptimeRobot (gratis)
+```
+
+El free tier de Render duerme el proceso si no recibe tráfico HTTP.
+El truco: el bot levanta un servidor HTTP mínimo en `server.py`, y UptimeRobot
+lo pingea cada 14 minutos para mantenerlo despierto.
+
+---
+
+### Paso 1 — Subir el código a GitHub
+
+```bash
+git init
+git add .
+git commit -m "first commit"
+git remote add origin https://github.com/TU_USUARIO/price-monitor.git
+git push -u origin main
+```
+
+> ⚠️ Asegurate de que `.gitignore` esté incluido para no subir el `.env`.
+
+---
+
+### Paso 2 — Crear el servicio en Render
+
+1. Entrá a [render.com](https://render.com) → **New → Web Service**
+2. Conectá tu repo de GitHub
+3. Render detecta el `render.yaml` automáticamente
+4. En **Environment**, cargá estas variables manualmente:
+
+| Key | Valor |
+|-----|-------|
+| `TELEGRAM_BOT_TOKEN` | Token de @BotFather |
+| `TELEGRAM_CHAT_ID` | Tu chat ID |
+| `PRICE_DROP_THRESHOLD_PERCENT` | `5` |
+| `CHECK_INTERVAL_HOURS` | `1` |
+| `PORT` | `8080` |
+| `DB_FILE` | `prices.db` |
+
+5. Click **Create Web Service** → Render instala deps y arranca el bot
+
+---
+
+### Paso 3 — Configurar UptimeRobot (gratis)
+
+1. Creá cuenta en [uptimerobot.com](https://uptimerobot.com)
+2. **Add New Monitor**:
+   - Type: **HTTP(s)**
+   - URL: `https://TU-APP.onrender.com/`
+   - Interval: **14 minutes**
+3. Click **Create Monitor**
+
+✅ Listo — el bot queda activo 24/7 sin costo.
+
+---
+
+### ⚠️ Limitación importante: SQLite en free tier
+
+El filesystem de Render es **efímero** en free tier: los datos se borran en cada redeploy.
+
+| Solución | Costo | Dificultad |
+|----------|-------|------------|
+| Render Starter + disco persistente | $7/mes | Descomentá `disk:` en `render.yaml` |
+| **Supabase** (Postgres gratis 500MB) | $0 | Migrar `database.py` a psycopg2 |
+| Aceptar pérdida de historial | $0 | No hacer nada |
+
+Pedime que te adapte `database.py` a PostgreSQL/Supabase si lo necesitás.
+
+---
+
+### Verificar que funciona
+
+```bash
+curl https://TU-APP.onrender.com/        # → "OK"
+curl https://TU-APP.onrender.com/status  # → lista de productos con precios
+```
+
+---
+
 ## 🐳 Docker (opcional)
 
 ```dockerfile
