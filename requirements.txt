@@ -4,7 +4,6 @@ lxml==5.1.0
 playwright==1.42.0
 python-telegram-bot==20.8
 matplotlib==3.8.3
-pandas==2.2.1
 APScheduler==3.10.4
 python-dotenv==1.0.1
 fake-useragent==1.4.0
