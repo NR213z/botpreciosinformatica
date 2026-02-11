@@ -1,0 +1,21 @@
+# Entorno y secretos — NUNCA subir a Git
+.env
+*.db
+*.sqlite
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Playwright
+.playwright/
+
+# OS
+.DS_Store
+Thumbs.db

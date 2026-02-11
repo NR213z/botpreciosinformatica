@@ -1,0 +1,57 @@
+services:
+  - type: web                  # "web" para free tier (no "worker")
+    name: price-monitor-bot
+    runtime: python
+    plan: free
+
+    # ── Build ──
+    buildCommand: |
+      pip install -r requirements.txt &&
+      playwright install chromium &&
+      playwright install-deps chromium
+
+    # ── Start ──
+    startCommand: python telegram_bot.py
+
+    # ── Variables de entorno ──
+    # Estas las cargás desde el dashboard de Render (Environment → Add from .env)
+    # NUNCA subas el .env real a Git
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false          # Render te pide el valor manualmente
+
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+
+      - key: PRICE_DROP_THRESHOLD_PERCENT
+        value: "5"
+
+      - key: CHECK_INTERVAL_HOURS
+        value: "1"
+
+      - key: SCRAPE_DELAY_SECONDS
+        value: "3"
+
+      - key: REQUEST_TIMEOUT
+        value: "15"
+
+      - key: DB_FILE
+        value: "/data/prices.db"   # Disco persistente (ver abajo)
+
+      - key: PORT
+        value: "8080"              # Render asigna este puerto
+
+    # ── Disco persistente para SQLite ──
+    # IMPORTANTE: el filesystem de Render es efímero.
+    # Este disco persiste entre deploys. Solo disponible en plan Starter+.
+    # Si usás free tier, los datos se pierden al redeploy → usá plan Starter
+    # o bien migrá a un DB externo (ver nota en README).
+    #
+    # Descomentá estas líneas si tenés plan Starter:
+    # disk:
+    #   name: price-monitor-data
+    #   mountPath: /data
+    #   sizeGB: 1
+
+    # ── Health check (Render lo usa internamente) ──
+    healthCheckPath: /
